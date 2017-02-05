@@ -1,2 +1,2 @@
-*.pyc
+/src/*.pyc
 .series_info
