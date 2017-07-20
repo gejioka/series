@@ -1,69 +1,47 @@
-'''
-	Global variables
-'''
+import threading
 
 class GlobalVariables:
 
-	'''
-		Initialize a GlobalVariables object.
+	def __init__( self, transmission_client ):
+		'''
+			Description:	Initialize a GlobalVariables object.
+		'''
+		self.transmission_client = transmission_client
+		self.list_of_torrents=[]
+		self.lock=threading.Lock ( )
 
-		parameters: self, transmissionClient
-	'''
-	def __init__( self, transmissionClient ):
-		self.transmissionClient = transmissionClient
+	def get_transmission_client ( self ):
+		'''
+			Description:	Return the transmission client.
+		'''
+		return self.transmission_client
 
-	'''
-		Return the transmission client.
+	def add_torrent_to_list_of_torrents ( self, torrent ):
+		'''
+			Description:	Add a new torrent to list of torrents.
+		'''
+		self.list_of_torrents.append ( torrent )
 
-		parameters: self
-	'''
-	def getTransmissionClient ( self ):
-		return self.transmissionClient
+	def remove_torrent_from_list_of_torrents ( self, torrent ):
+		'''
+			Description:	Remove torrent from list of torrents.
+		'''
+		self.list_of_torrents.remove ( torrent )
 
-	'''
-		Set the serie name.
+	def set_list_of_torrents ( self, list_of_torrents ):
+		'''
+			Description:	Set list of torrents.
+		'''
+		self.list_of_torrents = list_of_torrents
 
-		parameters: self, serieName
-	'''
-	def setSerieName ( self, serieName ):
-		self.serieName = serieName
+	def get_list_of_torrents ( self ):
+		'''
+			Description:	Return list of torrents.
+		'''
+		return self.list_of_torrents
 
-	'''
-		Return the serie name.
-
-		parameters: self
-	'''
-	def getSerieName ( self ):
-		return serieName
-
-	'''
-		Set the season of serie.
-
-		parameters: self, serieSeason
-	'''
-	def setSerieSeason ( self, serieSeason ):
-		self.serieSeason = serieSeason
-	
-	'''
-		Return the season of serie.
-
-		parameters: self
-	'''
-	def getSerieSeason ( self ):
-		return self.serieSeason
-
-	'''
-		Set the episode of serie.
-
-		parameters: self, serieEpisode
-	'''
-	def setSerieEpisode ( self, serieEpisode ):
-		self.serieEpisode = serieEpisode
-
-	'''
-		Return the episode for this serie.
-
-		parameters: self
-	'''
-	def getSerieEpisode ( self ):
-		return serieEpisode
+	def get_lock ( self ):
+		'''
+			Return the lock.
+		'''
+		return self.lock

@@ -5,127 +5,103 @@ import transmissionrpc
 import FileManagement
 import PiratebaySearcher
 
-class TransmissionManager (threading.Thread):
+class transmission_manager (threading.Thread):
 
-	'''
-		Initialize a TransmissionManager object.
-
-		parameters: self, transmissionManager, fileManagement
-	'''
-	def __init__( self, transmissionManager, fileManagement ):
+	def __init__( self, transmission_manager, file_management, curr_torrent ):
+		'''
+			Description:	Initialize a transmission_manager object.
+		'''
 		threading.Thread.__init__(self)
-		self.transmissionManager = transmissionManager
-		self.fileManagement = fileManagement
+		self.transmission_manager = transmission_manager
+		self.file_management = file_management
+		self.curr_torrent = curr_torrent
 
-	'''
-		It's the code which threads run.
-
-		parameters: self
-	'''
 	def run ( self ):
-		dynamicSleepTime=5
-		maxSleepTime=120
+		'''
+			Description:	It's the code which threads run.
+		'''
+		dynamic_sleep_time=5
+		max_sleep_time=120
 
 		while True:
 			try:
-				self.torrent = self.transmissionManager.get_torrent ( self.torrentId )
+				self.torrent = self.transmission_manager.get_torrent ( self.torrent_id )
 				if self.torrent.status == 'downloading':
-					if dynamicSleepTime > maxSleepTime / 2:
-						dynamicSleepTime = 5
-					if self.torrent.eta.total_seconds ( ) > maxSleepTime:
-						dynamicSleepTime += 5
-						print ( 'Thread sleep for ' + str ( dynamicSleepTime ) + ' seconds.' )	
-						time.sleep ( dynamicSleepTime )
+					if dynamic_sleep_time > max_sleep_time / 2:
+						dynamic_sleep_time = 5
+					if self.torrent.eta.total_seconds ( ) > max_sleep_time:
+						dynamic_sleep_time += 5
+						print ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )	
+						time.sleep ( dynamic_sleep_time )
 					else:
-						dynamicSleepTime = self.torrent.eta.total_seconds ( )
-						print ( 'Thread sleep for ' + str ( dynamicSleepTime ) + ' seconds.' )
-						time.sleep ( dynamicSleepTime )
+						dynamic_sleep_time = self.torrent.eta.total_seconds ( )
+						print ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )
+						time.sleep ( dynamic_sleep_time )
 				else:
-					self.transmissionManager.stop_torrent( self.torrent.id )
-					self.transmissionManager.remove_torrent( self.torrent.id )
-					self.fileManagement.parseTorrentName ( self.torrent.name )
-					self.fileManagement.createFoldersForSeries ( self.fileManagement.getRootFolder ( ), self.fileManagement.getSerieName ( ) )
-					self.fileManagement.placeSerieToRightFolder ( )
+					self.transmission_manager.stop_torrent( self.torrent.id )
+					self.transmission_manager.remove_torrent( self.torrent.id )
 
-					exit ( )
+					self.file_management.create_folders_for_series ( self.file_management.get_root_folder ( ), self.curr_torrent.get_serie_name ( ) )
+					self.file_management.place_serie_to_right_folder ( )
+					
+					#Write serie's informations to file.
+					self.file_management.write_serie_info_to_file ( self.curr_torrent.get_serie_info ( ) )
+
+					break
 			except ValueError as e:
 				print ( e )
-				print ( 'Eta has no value yet.' )
 				time.sleep ( 5 )
 
-			except Exception as e:
-				print ( e )
-				print ( 'There is no specific torrent in torrent list.' )
-				exit ( )
+	def set_transmission_manager ( self, transmission_manager ):
+		'''
+			Description:	Set the transmission_manager.
+		'''
+		self.transmission_manager = transmission_manager
 
-	'''
-		Set the transmissionManager.
+	def get_transmission_manager ( self ):
+		'''
+			Description:	Return the transmission_manager.
+		'''
+		return self.transmission_manager
 
-		parameters: self, transmissionManager
-	'''
-	def setTransmissionManager ( self, transmissionManager ):
-		self.transmissionManager = transmissionManager
+	def set_torrent_id ( self, torrent_id ):
+		'''
+			Description:	Set the torrent id.
+		'''
+		self.torrent_id = torrent_id
 
-	'''
-		Return the transmissionManager.
+	def get_torrent_id ( self ):
+		'''
+			Description:	Return the torrent id.
+		'''
+		return torrent_id
 
-		parameters: self
-	'''
-	def getTransmissionManager ( self ):
-		return self.transmissionManager
-
-	'''
-		Set the torrent id.
-
-		parameters: self, torrentId
-	'''
-	def setTorrentId ( self, torrentId ):
-		self.torrentId = torrentId
-
-	'''
-		Return the torrent id.
-
-		parameters: self
-	'''
-	def getTorrentId ( self ):
-		return torrentId
-
-	'''
-		Set the torrent.
-
-		parameters: self, torrent
-	'''
-	def setTorrent ( self, torrent ):
+	def set_torrent ( self, torrent ):
+		'''
+			Description:	Set the torrent.
+		'''
 		self.torrent = torrent
 
-	'''
-		Return the torrent.
-
-		parameters: self
-	'''
-	def getTorrent ( self ):
+	def get_torrent ( self ):
+		'''
+			Description:	Return the torrent.
+		'''
 		return torrent
 
-	'''
-		Add a new torrent to transmission.
+	def add_torrent_to_transmission ( self, manget_link ):
+		'''
+			Description:	Add a new torrent to transmission.
+		'''
+		self.torrent = self.transmission_manager.add_torrent ( manget_link )
 
-		parameters: self, mangetLink
-	'''
-	def addTorrentToTransmission ( self, mangetLink ):
-		self.torrent = self.transmissionManager.add_torrent ( mangetLink )
+	def set_torrents_list ( self, torrents_list ):
+		'''
+			Description:	Set the list of torrents.
+		'''
+		self.torrents_list = torrents_list
 
-	'''
-		Set the list of torrents.
-
-		parameters self, torrentsList
-	'''
-	def setTorrentsList ( self, torrentsList ):
-		self.torrentsList = torrentsList
-
-	'''
-		Return the torrent list.
-
-		parameters: self
-	'''
-	def getTorrentsList ( self ):
-		return self.torrentsList
+	def get_torrents_list ( self ):
+		'''
+			Description:	Return the torrent list.
+		'''
+		return self.torrents_list
