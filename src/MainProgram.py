@@ -36,7 +36,8 @@ while True:
 	print '-vs: 	View list of series'
 	print '-rs: 	Remove a serie' 	
 	print '-rss: 	Remove a season of this serie'
-	print '-rse: 	Remove an episode of this serie\n' 		
+	print '-rse: 	Remove an episode of this serie'
+	print '-q:	Quit from application\n'	 		
 
 	# Get user option.
 	option = raw_input ( 'Choose one of the following options: ' )
@@ -69,10 +70,10 @@ while True:
 
 			# Create torrent and add it to queue.
 			serie_info = {	'header' 	: 'n',
-					'serie_name' 	: serie['title'],
-					'serie_season' 	: serie_season,
-					'serie_episode' 	: serie_episode,
-					'serie_id' 	: serie['imdb_id'] }
+							'serie_name' 	: serie['title'],
+							'serie_season' 	: serie_season,
+							'serie_episode' 	: serie_episode,
+							'serie_id' 	: serie['imdb_id'] }
 
 			torrent.set_serie_info ( serie_info )
 
@@ -80,19 +81,6 @@ while True:
 			globalVariables.add_torrent_to_list_of_torrents ( torrent )
 
 			series_prot.add_new_serie ( serie_info )
-
-			# Set user input.
-			#file_management.user_input ( )
-
-			# Write serie's informations to file.
-			#file_management.write_serie_info_to_file ( )
-
-			# Try to release the lock for piratebay thread.
-			#while True:
-			#	try:
-			#		piratebaySearcher.get_lock ( ).release ( )
-			#	except Exception:
-			#		break
 	elif option == '-vs':
 		pass
 		# TODO: Print all series.
@@ -105,6 +93,13 @@ while True:
 	elif option == '-rse':
 		pass
 		# TODO: Remove an episode of this serie.
+	elif option == '-q':
+		# Create structure and add it to queue.
+		serie_info = {	'header' 	: 'q',
+						'data' 		: ''  }
+		series_prot.add_new_serie ( serie_info )
+
+		break
 	else:
 		bad_name=True
 	clear ( )

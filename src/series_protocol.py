@@ -69,14 +69,13 @@ class series_protocol:
 		# Read all file and put all contents to a queue.
 		try:
 			for line in file:
-				print line
 				# Create serie info structure and add a new header.
 				curr = ast.literal_eval ( line )
 				serie_info = {	'header' 	: 'e',
-						'serie_name' 	: curr['serie_name'],
-						'serie_season' 	: curr['serie_season'],
-						'serie_episode' 	: curr['serie_episode'],
-						'serie_id' 	: curr['serie_id'] }
+								'serie_name' 	: curr['serie_name'],
+								'serie_season' 	: curr['serie_season'],
+								'serie_episode' 	: curr['serie_episode'],
+								'serie_id' 	: curr['serie_id'] }
 
 				# Set serie info for this object.
 				#self.torrent.set_serie_info ( serie_info )
@@ -84,7 +83,6 @@ class series_protocol:
 				self.series_queue.put ( serie_info )
 		except Exception as e:
 			print e
-			print 'There is no serie in file.'
 		
 		# Close file.
 		file.close ( )
@@ -94,12 +92,6 @@ class series_protocol:
 			Description:	Search list of torrents and return torrent object with same id.
 		'''
 		for current_torrent in self.global_variables.get_list_of_torrents ( ):
-			print current_torrent.get_serie_id ( )
-			print curr_serie['serie_id']
-			print current_torrent.get_serie_season ( )
-			print curr_serie['serie_season']
-			print current_torrent.get_serie_episode ( )
-			print curr_serie['serie_episode']
 			if current_torrent.get_serie_id ( ) == curr_serie['serie_id'] and int ( current_torrent.get_serie_season ( ) ) == int ( curr_serie['serie_season'] ) \
 				and int ( current_torrent.get_serie_episode ( ) ) == int ( curr_serie['serie_episode'] ):
 				return current_torrent
@@ -126,7 +118,7 @@ class series_protocol:
 				# Create a file_management object.
 				file_management =  FileManagement.FileManagement ( current_torrent, self.global_variables )
 				# Create a piratebay searcher object.
-				piratebaySearcher = PiratebaySearcher.PiratebaySearcher ( file_management, current_torrent, self.global_variables.get_transmission_client ( ) )
+				piratebaySearcher = PiratebaySearcher.PiratebaySearcher ( file_management, current_torrent, self.global_variables.get_transmission_client ( ), self.global_variables )
 				# Start piratebay searcher.
 				piratebaySearcher.start ( )
 				# Change header to exist.
@@ -155,9 +147,15 @@ class series_protocol:
 				# Find correct torrent object of list.
 				current_torrent = self.find_torrent_object ( torrent.get_serie_info ( ) )
 				# Create a piratebay searcher object.
-				piratebaySearcher = PiratebaySearcher.PiratebaySearcher ( file_management, current_torrent, self.global_variables.get_transmission_client ( ) )
+				piratebaySearcher = PiratebaySearcher.PiratebaySearcher ( file_management, current_torrent, self.global_variables.get_transmission_client ( ), self.global_variables )
 				# Start piratebay searcher.
 				piratebaySearcher.start ( )
+			elif curr_serie['header'] == 'q':
+				if len ( self.global_variables.get_status_list ( ) ) == 0:
+					break
+				else:
+					self.global_variables.get_exit_event ( ).wait ( )
+					break
 			else:
 				# TODO: Code for bad header.
 				pass

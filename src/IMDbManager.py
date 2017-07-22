@@ -51,9 +51,6 @@ class IMDbManager:
 
 		for episode in episodes:
 			if episode.season == serie_season and episode.episode == serie_episode:
-				#self.file_management.set_serie_season ( str ( episode.season ).zfill ( 2 ) )
-				#self.file_management.set_serie_episode ( str ( episode.episode ).zfill ( 2 ) )
-
 				return True
 
 		print 'This episode doesn\'t exist. Give a different season and episode.'

@@ -23,10 +23,12 @@ class PiratebaySearcher(threading.Thread):
 	torrent_magnet=None
 	# A variable for the transmission manager.
 	transmission_manager=None
+	# A variable for the global structures.
+	global_variables=None
 	# A variable for most popular torrents (optional). 
 	most_popular_torrents_info=None
 
-	def __init__( self, file_management, torrent, transmission_manager, basic_URL='https://thepiratebay.org/' ):
+	def __init__( self, file_management, torrent, transmission_manager, global_variables, basic_URL='https://thepiratebay.org/' ):
 		'''
 			Description:	Initialize a PiratebaySearcher object.
 		'''
@@ -44,23 +46,23 @@ class PiratebaySearcher(threading.Thread):
 		self.file_management = file_management
 		# Set transmission manager. 
 		self.transmission_manager = transmission_manager
+		# Set global variables object.
+		self.global_variables = global_variables
 
 	def run ( self ):
 		'''
 			Description:	It's the code which threads run.
 		'''
-		#self.lock.acquire ( )
 
-		# Check if the specific episode is garbage.
-		#if not self.file_management.get_is_junk ( ):
-
+		# Add a new member to status list.
+		self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
 		# Create requested URL in string.
 		self.create_requested_URL_string ( self.torrent.get_serie_name ( ), self.torrent.get_serie_season ( ), self.torrent.get_serie_episode ( ) )
 		# Find five most popular torrents (optional). 
 		self.find_five_most_popular_torrents_info ( self.torrent.get_serie_name ( ) )
 		try:
 			# Create a transmission manager object.
-			torrentThread = TransmissionManager.transmission_manager ( self.transmission_manager, self.file_management, self.torrent )
+			torrentThread = TransmissionManager.transmission_manager ( self.transmission_manager, self.file_management, self.torrent, self.global_variables )
 			# Add first torrent to transmission.
 			torrentThread.add_torrent_to_transmission ( self.most_popular_torrents_info[0]['torrent_magnet'] )
 			for current_torrent in self.transmission_manager.get_torrents ( ):
@@ -81,6 +83,12 @@ class PiratebaySearcher(threading.Thread):
 					
 		except Exception as e:
 			print ( e )
+
+		# Remove specific member from status list.
+		self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		# Wake up the main thread if there are no threads on status list.
+		if len ( self.global_variables.get_status_list ( ) ) == 0:
+			self.global_variables.get_exit_event ( ).set ( )
 
 	def set_lock ( self, lock ):
 		'''
@@ -167,36 +175,3 @@ class PiratebaySearcher(threading.Thread):
 			Description:	Return the most popular torrents.
 		'''
 		return self.most_popular_torrents_info
-
-
-######################## Testing ##########################
-'''
-file_management = file_management.file_management ( )
-file_management.createRootFolder ( )
-file_management.createFileWithSeriesInfo ( )
-file_management.parseFileName ('Arrow.S05E05.HDTV.x264-LOL[ettv]')
-file_management.writeSeriesInfoToFile ( )
-file_management.createFoldersForSeries ( file_management.getRootFolder ( ), file_management.getSerieName ( ) + "/" )
-file_management.createPathForEpisode ( )
-
-piratebaySearcher = PiratebaySearcher ( )
-piratebaySearcher.createrequested_URLString ( file_management.getSerieName ( ), file_management.getSerieSeason ( ), file_management.getSerieEpisode ( ) )
-piratebaySearcher.setrequested_URL ( )
-piratebaySearcher.sethtml_parser ( )
-piratebaySearcher.findFivemost_popular_torrents_info ( file_management.getSerieName ( ) )
-'''
-'''
-file_management = file_management.file_management ( )
-file_management.createRootFolder ( )
-file_management.createFileWithSeriesInfo ( )
-file_management.parseFileName ("Supernatural S01E01 HDTV")
-file_management.writeSeriesInfoToFile ( )
-file_management.createFoldersForSeries ( file_management.getRootFolder ( ), file_management.getSerieName ( ) + "/" )
-file_management.createPathForEpisode ( )
-
-piratebaySearcher = PiratebaySearcher ( )
-piratebaySearcher.createrequested_URLString ( file_management.getSerieName ( ), file_management.getSerieSeason ( ), file_management.getSerieEpisode ( ) )
-piratebaySearcher.setrequested_URL ( )
-piratebaySearcher.sethtml_parser ( )
-piratebaySearcher.findFivemost_popular_torrents_info ( file_management.getSerieName ( ) )
-'''

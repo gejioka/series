@@ -149,7 +149,6 @@ class FileManagement:
 				if serie_dict['serie_id'] == serie_info['serie_id']:
 					data[count] = str ( serie_info )
 				count += 1
-			print data
 			data_str = "\n".join ( data )
 			# Check if serie is the first serie.
 			if len ( data ) == 0:

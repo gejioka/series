@@ -7,7 +7,7 @@ import PiratebaySearcher
 
 class transmission_manager (threading.Thread):
 
-	def __init__( self, transmission_manager, file_management, curr_torrent ):
+	def __init__( self, transmission_manager, file_management, curr_torrent, global_variables ):
 		'''
 			Description:	Initialize a transmission_manager object.
 		'''
@@ -15,6 +15,7 @@ class transmission_manager (threading.Thread):
 		self.transmission_manager = transmission_manager
 		self.file_management = file_management
 		self.curr_torrent = curr_torrent
+		self.global_variables = global_variables
 
 	def run ( self ):
 		'''
@@ -22,6 +23,7 @@ class transmission_manager (threading.Thread):
 		'''
 		dynamic_sleep_time=5
 		max_sleep_time=120
+		self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
 
 		while True:
 			try:
@@ -51,6 +53,12 @@ class transmission_manager (threading.Thread):
 			except ValueError as e:
 				print ( e )
 				time.sleep ( 5 )
+
+		# Remove member from status list.
+		self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		# Wake up the main thread if there are no threads on status list.
+		if len ( self.global_variables.get_status_list ( ) ) == 0:
+			self.global_variables.get_exit_event ( ).set ( )
 
 	def set_transmission_manager ( self, transmission_manager ):
 		'''
