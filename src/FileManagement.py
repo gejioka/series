@@ -138,16 +138,26 @@ class FileManagement:
 		'''
 		with self.global_variables.get_lock ( ):
 			# Open file with series info for reading.
-			target = open ( self.series_info_path, 'r' )
+			try:
+				target = open ( self.series_info_path, 'r' )
+			except Exception as err:
+				write_error_message ( '[!] ' + str ( err ) )
 			# Read all file.
 			data = [x.strip('\n') for x in target.readlines ( )]
 			# Close file.
-			target.close ( )
+			try:
+				target.close ( )
+			except Exception as err:
+				write_error_message ( '[!] ' + str ( err ) )
 
 			# Try to find serie with same id and update it.
 			count=0
 			for serie in data:
-				serie_dict = ast.literal_eval ( serie )
+				try:
+					serie_dict = ast.literal_eval ( serie )
+				except Exception as err:
+					write_error_message ( '[!] ' + str ( err ) )
+
 				if serie_dict['serie_id'] == serie_info['serie_id']:
 					data[count] = str ( serie_info )
 				count += 1
@@ -172,8 +182,11 @@ class FileManagement:
 		'''
 			Description:	Create the folder for this serie.
 		'''
-		if not os.path.exists ( root_folder + serie_name + serie_season + serie_episode ):
-			os.makedirs ( root_folder + serie_name + serie_season + serie_episode )
+		try:
+			if not os.path.exists ( root_folder + serie_name + serie_season + serie_episode ):
+				os.makedirs ( root_folder + serie_name + serie_season + serie_episode )
+		except Exception as err:
+			write_error_message ( '[!] ' + str ( err ) )
 			
 		if serie_season == "":
 			self.create_folders_for_series ( root_folder, serie_name, "/Season " + str ( self.torrent_object.get_serie_season ( ) ) + "/" )

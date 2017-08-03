@@ -55,10 +55,13 @@ while True:
 		# Print first 20 results.
 		serie = imdb.print_series_match ( serie_name )
 
-		# Ask user for serie season.
-		serie_season = int ( raw_input ( 'Enter serie season: ' ) )
-		# Ask user fot serie episode.
-		serie_episode = int ( raw_input ( 'Enter serie episode: ' ) )
+		try:
+			# Ask user for serie season.
+			serie_season = int ( raw_input ( 'Enter serie season: ' ) )
+			# Ask user fot serie episode.
+			serie_episode = int ( raw_input ( 'Enter serie episode: ' ) )
+		except Exception as err:
+			write_error_message ( '[!] ' + str ( err ) )
 
 		if imdb.episode_exists ( serie_season, serie_episode, serie['imdb_id'] ):
 			# Create a torrent object.

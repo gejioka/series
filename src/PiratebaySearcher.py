@@ -56,7 +56,11 @@ class PiratebaySearcher(threading.Thread):
 		'''
 
 		# Add a new member to status list.
-		self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
+		try:
+			self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
+		except Exception as err:
+			write_error_message ( '[!] ' + str ( err ) )
+
 		# Write info message to series log file.
 		write_info_message ( '[+] A new member added to member list.' )
 		# Write debug message to series log file.
@@ -107,7 +111,7 @@ class PiratebaySearcher(threading.Thread):
 		try:
 			self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
 		except Exception as e:
-			write_error_message ( str ( e ) )
+			write_error_message ( '[!] ' + str ( e ) )
 
 		# Wake up the main thread if there are no threads on status list.
 		if len ( self.global_variables.get_status_list ( ) ) == 0:

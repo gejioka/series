@@ -69,7 +69,10 @@ class series_protocol:
 		'''
 
 		# Open series informations file.
-		file = open ( self.series_info_path, 'r' )
+		try:
+			file = open ( self.series_info_path, 'r' )
+		except Exception as e:
+			write_error_message ( '[!] ' + str ( err ) )
 
 		# Read all file and put all contents to a queue.
 		try:
@@ -94,7 +97,10 @@ class series_protocol:
 			write_error_message ( '[!] ' + str ( e ) )
 		
 		# Close file.
-		file.close ( )
+		try:
+			file.close ( )
+		except Exception as err:
+			write_error_message ( '[!] ' + str ( err ) )
 
 	def find_torrent_object ( self, curr_serie ):
 		'''

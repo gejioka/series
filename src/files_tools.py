@@ -1,5 +1,6 @@
 import os
 import os.path
+from series_protocol_log import *
 
 ######## Global variables ########
 root_folder=None
@@ -50,5 +51,8 @@ def create_file_with_series_info ( ):
 	'''
 	global file_with_series_info
 
-	if not os.path.exists ( file_with_series_info ):
-		open ( file_with_series_info, 'a' ).close ( )
+	try:
+		if not os.path.exists ( file_with_series_info ):
+			open ( file_with_series_info, 'a' ).close ( )
+	except Exception as err:
+		write_error_message ( '[!] ' + str ( err ) )

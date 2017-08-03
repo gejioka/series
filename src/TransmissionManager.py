@@ -66,7 +66,7 @@ class transmission_manager (threading.Thread):
 		try:
 			self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
 		except Exception as e:
-			write_error_message ( str ( e ) )
+			write_error_message ( '[!] ' + str ( e ) )
 
 		# Wake up the main thread if there are no threads on status list.
 		if len ( self.global_variables.get_status_list ( ) ) == 0:
