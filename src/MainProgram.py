@@ -8,6 +8,7 @@ import os
 from torrent_structure import *
 from IMDbManager import *
 from series_protocol import *
+from series_protocol_log import *
 
 # Create lambda expression to clear console.
 clear = lambda: os.system ( 'clear' )
@@ -37,6 +38,7 @@ while True:
 	print '-rs: 	Remove a serie' 	
 	print '-rss: 	Remove a season of this serie'
 	print '-rse: 	Remove an episode of this serie'
+	print '-sen:  Tell protocol that have seen the episode' 	
 	print '-q:	Quit from application\n'	 		
 
 	# Get user option.
@@ -69,18 +71,20 @@ while True:
 			torrent.set_serie_id ( serie['imdb_id'] )
 
 			# Create torrent and add it to queue.
-			serie_info = {	'header' 	: 'n',
+			serie_info = {	'header' 		: 'n',
 							'serie_name' 	: serie['title'],
 							'serie_season' 	: serie_season,
 							'serie_episode' 	: serie_episode,
-							'serie_id' 	: serie['imdb_id'] }
+							'serie_id' 		: serie['imdb_id'] }
 
 			torrent.set_serie_info ( serie_info )
 
 			# Add torrent to list of torrents.
 			globalVariables.add_torrent_to_list_of_torrents ( torrent )
-
 			series_prot.add_new_serie ( serie_info )
+			
+			# Write info message to series log file.
+			write_info_message ( '[+] A new torrent object created and added to list.' )
 	elif option == '-vs':
 		pass
 		# TODO: Print all series.
@@ -93,6 +97,9 @@ while True:
 	elif option == '-rse':
 		pass
 		# TODO: Remove an episode of this serie.
+	elif option == '-sen':
+		# TODO: A new field for episodes.
+		pass
 	elif option == '-q':
 		# Create structure and add it to queue.
 		serie_info = {	'header' 	: 'q',

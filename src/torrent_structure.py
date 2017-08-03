@@ -61,11 +61,11 @@ class torrent_structure:
 		'''
 			Description:	Create the informations for this torrent.
 		'''
-		self.serie_info = {	'header' 	: 'e',
+		self.serie_info = {	'header' 		: 'e',
 							'serie_name' 	: self.serie_name,
 							'serie_season' 	: self.serie_season,
 							'serie_episode' 	: self.serie_episode,
-							'serie_id' 	: self.serie_id }
+							'serie_id' 		: self.serie_id }
 
 	def set_serie_info ( self, serie_info ):
 		'''

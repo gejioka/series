@@ -4,6 +4,7 @@ import re
 import ast
 import requests
 from difflib import SequenceMatcher
+from series_protocol_log import *
 from files_tools import *
 
 class FileManagement:
@@ -142,6 +143,7 @@ class FileManagement:
 			data = [x.strip('\n') for x in target.readlines ( )]
 			# Close file.
 			target.close ( )
+
 			# Try to find serie with same id and update it.
 			count=0
 			for serie in data:
@@ -153,11 +155,18 @@ class FileManagement:
 			# Check if serie is the first serie.
 			if len ( data ) == 0:
 				data_str = str ( serie_info )
+				# Write debug message to series log file.
+				write_info_message ( '[+] Add a new serie to .series_info file.' )
+				write_debug_message ( '[+] Wrote a new serie with name ' + str ( serie_info['serie_name'] ) + ' to .series_info file.')
 
 			# Open a file for writing.
 			with  open ( self.series_info_path, 'w' ) as target:
 				# Write updated serie to file.
 				target.write ( data_str )
+				# Write an info message to series log file.
+				write_info_message ( '[+] Updated an existance serie.' )
+				# Write a debug mesage to series log file.
+				write_debug_message ( '[+]Add existance serie with name ' + str ( serie_info['serie_name'] ) + ' to .series_info file.' )
 		
 	def create_folders_for_series ( self, root_folder="", serie_name="", serie_season="", serie_episode="" ):
 		'''
@@ -168,10 +177,19 @@ class FileManagement:
 			
 		if serie_season == "":
 			self.create_folders_for_series ( root_folder, serie_name, "/Season " + str ( self.torrent_object.get_serie_season ( ) ) + "/" )
+			# Write an info message to series log file.
+			write_info_message ( '[+] Create a new folder for season.' )
+			# Write a debug message to series log file.
+			write_debug_message ( '[+] Create a new folder for season ' + str ( serie_season ) + ' of serie with name ' + str ( serie_name ) + '.' )
 		elif serie_episode == "":
 			self.create_folders_for_series ( root_folder, serie_name, str ( serie_season ), "Episode " + str ( self.torrent_object.get_serie_episode ( ) ) + "/" )
+			# Write an info message to series log file.
+			write_info_message ( '[+] Create new folder for episode.' )
+			# Write a debug message to series log file.
+			write_debug_message ( '[+] Create a new folder for episode ' + str ( serie_episode ) + ' of season ' + str ( serie_season ) + ' of serie with name ' + str ( serie_name ) + '.' )
 		else:
-			print ( "Create all subfolders for this serie." )
+			# Write debug message to series log file.
+			write_debug_message ( '[!] Create all subfolders for this episode succesfull.' )
 
 	def similar ( self, first_file, second_file ):
 		'''
@@ -202,11 +220,23 @@ class FileManagement:
 			if os.path.isdir ( self.download_path_of_series + correct_file ):
 				for file in os.listdir ( self.download_path_of_series + correct_file ):
 					os.rename ( os.path.realpath ( self.download_path_of_series + correct_file + '/' + file ), self.path_for_episode + file )
+					# Write info message to series log file.
+					write_info_message ( '[+] Replace a file to correct folder.' )
+					# Write debug message to series log file.
+					write_debug_message ( '[+] Replace file with name ' + str ( file ) + ' to ' + str ( self.path_for_episode + file ) + ' path.' )
+				# Write info message to series log file.
+				write_info_message ( '[-] Remove folder for download path.' )
+				# Remove folder.
 				os.rmdir ( correct_file )
 			else:
 				os.rename ( os.path.realpath ( self.download_path_of_series + correct_file ), self.path_for_episode + correct_file )
+				# Write info message to series log file.
+				write_info_message ( '[+] Replace a file to correct folder.' )
+				# Write debug message to series log file.
+				write_debug_message ( '[+] Replace episode file with name ' + str ( correct_file ) + ' to ' + str ( self.path_for_episode + correct_file ) + ' path.' )
 		except Exception as e:
-			print e
+			# Write error message to series log file.
+			write_error_message ( str ( e ) ) 
 
 	def user_input ( self ):
 		'''

@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from series_protocol_log import * 
 import FileManagement
 import threading
 import requests
@@ -56,6 +57,10 @@ class PiratebaySearcher(threading.Thread):
 
 		# Add a new member to status list.
 		self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
+		# Write info message to series log file.
+		write_info_message ( '[+] A new member added to member list.' )
+		# Write debug message to series log file.
+		write_debug_message ( '[+] A new member with id ' + str ( threading.current_thread ( ) ) + ' added to member list. It\'s status is running.' )
 		# Create requested URL in string.
 		self.create_requested_URL_string ( self.torrent.get_serie_name ( ), self.torrent.get_serie_season ( ), self.torrent.get_serie_episode ( ) )
 		# Find five most popular torrents (optional). 
@@ -65,6 +70,10 @@ class PiratebaySearcher(threading.Thread):
 			torrentThread = TransmissionManager.transmission_manager ( self.transmission_manager, self.file_management, self.torrent, self.global_variables )
 			# Add first torrent to transmission.
 			torrentThread.add_torrent_to_transmission ( self.most_popular_torrents_info[0]['torrent_magnet'] )
+			# Write info message to series log file.
+			write_info_message ( '[+] Add torrent magnet to transmission.' )
+			# Write debug message to series log file.
+			write_debug_message ( '[+] A new torrent magnet which value is ' + str ( self.most_popular_torrents_info[0]['torrent_magnet'] ) + ' added to transmission client.' )
 			for current_torrent in self.transmission_manager.get_torrents ( ):
 				if self.most_popular_torrents_info[0]['torrent_name'] == current_torrent.name:
 					# Set torrent name.
@@ -73,6 +82,11 @@ class PiratebaySearcher(threading.Thread):
 					torrentThread.set_torrent_id ( current_torrent.id )
 					# Start transmission thread.
 					torrentThread.start ( )
+					# Write info message to series log file.
+					write_info_message ( '[+] A new transmission main thread start running.' )
+					# Write debug message to series log file.
+					write_debug_message ( '[+] A new transmission main thread with id ' + str ( threading.current_thread ( ) ) + ' start running to serve torrent with \
+												name ' + current_torrent.name + ' and torrent id ' + str ( current_torrent.id ) )
 				elif '+' in current_torrent.name and self.most_popular_torrents_info[0]['torrent_name'] == current_torrent.name.replace ( '+', ' ' ):
 					# Set torrent name.
 					self.file_management.set_torrent_name ( current_torrent.name )
@@ -80,12 +94,21 @@ class PiratebaySearcher(threading.Thread):
 					torrentThread.set_torrent_id ( current_torrent.id )
 					# Start transmission thread.
 					torrentThread.start ( )
-					
+					# Write info message to series log file.
+					write_info_message ( '[+] A new transmission main thread start running.' )
+					# Write debug message to series log file.
+					write_debug_message ( '[+] A new transmission main thread with id ' + str ( threading.current_thread ( ) ) + ' start running to serve torrent with \
+												name ' + current_torrent.name + ' and torrent id ' + str ( current_torrent.id ) )
 		except Exception as e:
-			print ( e )
+			# Write error message to series log file.
+			write_error_message ( '[!] ' + str ( e ) )
 
 		# Remove specific member from status list.
-		self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		try:
+			self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		except Exception as e:
+			write_error_message ( str ( e ) )
+
 		# Wake up the main thread if there are no threads on status list.
 		if len ( self.global_variables.get_status_list ( ) ) == 0:
 			self.global_variables.get_exit_event ( ).set ( )
@@ -164,7 +187,7 @@ class PiratebaySearcher(threading.Thread):
 				current_name = a_tag.text
 			if ( pattern_magnet.match ( a_tag.attrs['href'] ) ):
 				self.most_popular_torrents_info.append({ 	'torrent_name' 		: current_name,
-										'torrent_magnet'	: a_tag.attrs['href']})
+															'torrent_magnet'	: a_tag.attrs['href']})
 				count+=1
 			
 			if ( count >= 5 ):

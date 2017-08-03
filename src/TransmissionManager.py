@@ -4,6 +4,7 @@ import threading
 import transmissionrpc
 import FileManagement
 import PiratebaySearcher
+from series_protocol_log import *
 
 class transmission_manager (threading.Thread):
 
@@ -23,26 +24,32 @@ class transmission_manager (threading.Thread):
 		'''
 		dynamic_sleep_time=5
 		max_sleep_time=120
+		
+		# Add a new member to status list.
 		self.global_variables.add_member_to_status_list ( threading.current_thread ( ), 'r' )
 
 		while True:
 			try:
 				self.torrent = self.transmission_manager.get_torrent ( self.torrent_id )
+				# Every n seconds check torrent status.
 				if self.torrent.status == 'downloading':
+					# Calculate dynamic sleep time.
 					if dynamic_sleep_time > max_sleep_time / 2:
 						dynamic_sleep_time = 5
 					if self.torrent.eta.total_seconds ( ) > max_sleep_time:
 						dynamic_sleep_time += 5
-						print ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )	
+						write_debug_message  ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )	
 						time.sleep ( dynamic_sleep_time )
 					else:
 						dynamic_sleep_time = self.torrent.eta.total_seconds ( )
-						print ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )
+						write_debug_message ( 'Thread sleep for ' + str ( dynamic_sleep_time ) + ' seconds.' )
 						time.sleep ( dynamic_sleep_time )
 				else:
+					# Stop and remove torrent from transmission list.
 					self.transmission_manager.stop_torrent( self.torrent.id )
 					self.transmission_manager.remove_torrent( self.torrent.id )
 
+					# Create all folders for this episode and replace it there.
 					self.file_management.create_folders_for_series ( self.file_management.get_root_folder ( ), self.curr_torrent.get_serie_name ( ) )
 					self.file_management.place_serie_to_right_folder ( )
 					
@@ -51,14 +58,22 @@ class transmission_manager (threading.Thread):
 
 					break
 			except ValueError as e:
-				print ( e )
+				# Write to series log file and wait 5 seconds.
+				write_warning_message ( '[!] ' + str ( e ) )
 				time.sleep ( 5 )
 
 		# Remove member from status list.
-		self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		try:
+			self.global_variables.remove_member_from_status_list ( threading.current_thread ( ) )
+		except Exception as e:
+			write_error_message ( str ( e ) )
+
 		# Wake up the main thread if there are no threads on status list.
 		if len ( self.global_variables.get_status_list ( ) ) == 0:
-			self.global_variables.get_exit_event ( ).set ( )
+			try:
+				self.global_variables.get_exit_event ( ).set ( )
+			except Exception as e:
+				write_warning_message ( str ( e ) )
 
 	def set_transmission_manager ( self, transmission_manager ):
 		'''

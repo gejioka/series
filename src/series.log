@@ -1,0 +1,27 @@
+2017-08-03 21:28:19,033 - series.log - INFO - [!] Created series protocol main thread.
+2017-08-03 21:28:19,034 - series.log - DEBUG - [+] Main thread added serie with name Arrow to queue.
+2017-08-03 21:28:19,034 - series.log - INFO - [+] Main thread add a new task to queue.
+2017-08-03 21:28:19,034 - series.log - DEBUG - [+] There are 1 available tasks for the protocol.
+2017-08-03 21:28:19,034 - series.log - INFO - [+] Thread get next available task.
+2017-08-03 21:28:19,034 - series.log - DEBUG - [-] Next task is the 1 episode from 1 season of serie with name Arrow.
+2017-08-03 21:28:24,377 - series.log - INFO - [+] A new member added to member list.
+2017-08-03 21:28:24,377 - series.log - DEBUG - [+] A new member with id <PiratebaySearcher(Thread-2, started 140573205853952)> added to member list. It's status is running.
+2017-08-03 21:28:25,818 - series.log - INFO - [+] Add torrent magnet to transmission.
+2017-08-03 21:28:25,818 - series.log - DEBUG - [+] A new torrent magnet which value is magnet:?xt=urn:btih:25e18ba644f26e6c76cfd11756d2e49ba20ded99&dn=Arrow.S01E02.HDTV.x264-LOL.%5BVTV%5D.mp4&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Fzer0day.ch%3A1337&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969 added to transmission client.
+2017-08-03 21:28:25,820 - series.log - INFO - [+] A new transmission main thread start running.
+2017-08-03 21:28:25,821 - series.log - DEBUG - [+] A new transmission main thread with id <PiratebaySearcher(Thread-2, started 140573205853952)> start running to serve torrent with 												name Arrow.S01E02.HDTV.x264-LOL.[VTV].mp4 and torrent id 7
+2017-08-03 21:28:25,823 - series.log - WARNING - [!] eta not valid
+2017-08-03 21:28:30,831 - series.log - WARNING - [!] eta not valid
+2017-08-03 21:28:35,839 - series.log - WARNING - [!] eta not valid
+2017-08-03 21:28:40,847 - series.log - DEBUG - [!] Create all subfolders for this episode succesfull.
+2017-08-03 21:28:40,847 - series.log - INFO - [+] Create new folder for episode.
+2017-08-03 21:28:40,847 - series.log - DEBUG - [+] Create a new folder for episode  of season /Season 1/ of serie with name Arrow.
+2017-08-03 21:28:40,847 - series.log - INFO - [+] Create a new folder for season.
+2017-08-03 21:28:40,847 - series.log - DEBUG - [+] Create a new folder for season  of serie with name Arrow.
+2017-08-03 21:28:40,852 - series.log - INFO - [+] Replace a file to correct folder.
+2017-08-03 21:28:40,852 - series.log - DEBUG - [+] Replace episode file with name Arrow.S01E02.HDTV.x264-LOL.[VTV].mp4 to /home/giorgos/Documents/Projects/series/Arrow/Season 1/Episode 2/Arrow.S01E02.HDTV.x264-LOL.[VTV].mp4 path.
+2017-08-03 21:28:40,852 - series.log - INFO - [+] Updated an existance serie.
+2017-08-03 21:28:40,852 - series.log - DEBUG - [+]Add existance serie with name Arrow to .series_info file.
+2017-08-03 21:36:36,888 - series.log - INFO - [+] Thread get next available task.
+2017-08-03 21:36:36,888 - series.log - DEBUG - [!] Next task is the quit option of the user.
+2017-08-03 21:36:36,888 - series.log - INFO - Main thread of series protocol close without errors.
