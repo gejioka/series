@@ -10,6 +10,8 @@ from PiratebaySearcher import *
 from TransmissionManager import *
 from series_protocol_log import *
 from GlobalVariables import *
+from seriesdb_handler import *
+from imdbpie import Imdb
 
 class series_protocol:
 	def __init__( self, global_variables ):
@@ -22,20 +24,22 @@ class series_protocol:
 		self.download_path = find_download_path ( )
 		# A variable for series informations path.
 		self.series_info_path = find_file_with_series_info_path ( )
-		# Create a file with series info path.
-		create_file_with_series_info ( )
-		# A variable for global variables.
-		self.global_variables = global_variables
 		# Configure series log file.
 		configure_logging ( )
 		# Find the level of logging
 		find_log_level ( )
+		# Create the root folder for series.
+		create_root_folder ( )
+		# Create a file with series info path.
+		create_file_with_series_info ( )
+		# A variable for global variables.
+		self.global_variables = global_variables
+		# A variable for series queue.
+		self.series_queue = Queue.Queue ( )
 		# A variable for main thread of protocol.
 		self.main_thread_t = threading.Thread ( target=self.main_thread )
 		# Start main thread.
 		self.main_thread_t.start ( )
-		# A variable for series queue.
-		self.series_queue = Queue.Queue ( )
 
 	def add_new_serie ( self, serie_info ):
 		'''
@@ -64,14 +68,15 @@ class series_protocol:
 	def add_existing_series_to_queue ( self ):
 		'''
 			Description:	Add all series is stored to file in a queue.
-					Headers:	'n' for new serie
+			Headers:		'n' for new serie
 							'e' for existing serie
 		'''
 
 		# Open series informations file.
+		file=None
 		try:
 			file = open ( self.series_info_path, 'r' )
-		except Exception as e:
+		except Exception as err:
 			write_error_message ( '[!] ' + str ( err ) )
 
 		# Read all file and put all contents to a queue.
@@ -87,7 +92,7 @@ class series_protocol:
 				serie_info = {	'header' 		: 'e',
 								'serie_name' 	: curr['serie_name'],
 								'serie_season' 	: curr['serie_season'],
-								'serie_episode' 	: curr['serie_episode'],
+								'serie_episode' : curr['serie_episode'],
 								'serie_id' 		: curr['serie_id'] }
 								
 				# Add serie to queue.
@@ -137,8 +142,8 @@ class series_protocol:
 			
 			if curr_serie['header'] == 'n':
 				# Write debug message to log file.
-				write_debug_message ( '[-] A new serie with name ' + str ( curr_serie['serie_name'] ) + ' has appeared to queue. This serie \
-											has id ' + str ( curr_serie['serie_id'] ) + ' and the first episode that requested from user is ' + \
+				write_debug_message ( '[-] A new serie with name ' + str ( curr_serie['serie_name'] ) + ' has appeared to queue. This serie' + \
+											' has id ' + str ( curr_serie['serie_id'] ) + ' and the first episode that requested from user is ' + \
 												str ( curr_serie['serie_season'] ) + ' season and ' + str ( curr_serie['serie_episode'] ) + ' episode.' )
 
 				# Find correct torrent object of list.
@@ -151,6 +156,18 @@ class series_protocol:
 				piratebaySearcher.start ( )
 				# Change header to exist.
 				curr_serie['header'] = 'e'
+
+				# Create a new imdb object.
+				imdb = IMDbManager ( )
+
+				# Return current episode.
+				current_episode = imdb.find_current_episode ( current_torrent.get_serie_name ( ), current_torrent.get_serie_season ( ), current_torrent.get_serie_episode ( ), current_torrent.get_serie_id ( ) )
+
+				# Add new serie season and episode to seriesdb.
+				add_new_serie_to_db ( self.global_variables.get_db_connection ( ), curr_serie['serie_name'], curr_serie['serie_id'], curr_serie['year'] )
+				add_new_season ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], curr_serie['serie_season'] )
+				season_id = get_season_id ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], curr_serie['serie_season'] )[0]
+				add_new_episode ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], season_id, current_episode.title, 'unseen', current_episode.release_date, current_episode.type )
 
 			elif curr_serie['header'] == 'e':
 				# Write debug message to log file.
@@ -181,6 +198,24 @@ class series_protocol:
 				piratebaySearcher = PiratebaySearcher.PiratebaySearcher ( file_management, current_torrent, self.global_variables.get_transmission_client ( ), self.global_variables )
 				# Start piratebay searcher.
 				piratebaySearcher.start ( )
+
+				# Return all series seasons.
+				seasons = get_all_serie_seasons ( self.global_variables.get_db_connection ( ), curr_serie['serie_name'] )
+				
+				# Check if season exists.
+				new_season=True
+				for season in seasons:
+					if  next_episode.season <= season[2]: 
+						new_season=False
+
+				# If season doesn't exist add it to seriesdb.
+				if new_season:
+					add_new_season ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], next_episode.season )
+
+				# Add episode to seriesdb.
+				season_id = get_season_id ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], next_episode.season )[0]
+				add_new_episode ( self.global_variables.get_db_connection ( ), curr_serie['serie_id'], season_id, next_episode.title, 'unseen', next_episode.release_date, next_episode.type )
+
 			elif curr_serie['header'] == 'q':
 				# Write debug message to log file.
 				write_debug_message ( '[!] Next task is the quit option of the user.' )

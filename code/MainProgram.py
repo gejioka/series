@@ -9,6 +9,7 @@ from torrent_structure import *
 from IMDbManager import *
 from series_protocol import *
 from series_protocol_log import *
+from seriesdb_handler import *
 
 # Create lambda expression to clear console.
 clear = lambda: os.system ( 'clear' )
@@ -22,6 +23,17 @@ imdb = None
 bad_name=False
 # Clear console.
 clear ( )
+
+# Connect with database.
+con = mdb.connect ( 'localhost', 'root', 'oikonomidis24', 'seriesdb' )
+# Set seriesdb connection.
+globalVariables.set_db_connection ( con )
+# Create table for all series.
+create_series_table ( con )
+# Create table for seasons of all series.
+create_seasons_table ( con )
+# Create table for episodes.
+create_table_for_episodes ( con )
 
 ##### User interface #####
 while True:
@@ -38,7 +50,7 @@ while True:
 	print '-rs: 	Remove a serie' 	
 	print '-rss: 	Remove a season of this serie'
 	print '-rse: 	Remove an episode of this serie'
-	print '-sen:  Tell protocol that have seen the episode' 	
+	print '-sen:  	Tell protocol that have seen the episode' 	
 	print '-q:	Quit from application\n'	 		
 
 	# Get user option.
@@ -64,6 +76,8 @@ while True:
 			write_error_message ( '[!] ' + str ( err ) )
 
 		if imdb.episode_exists ( serie_season, serie_episode, serie['imdb_id'] ):
+			current_episode = imdb.find_current_episode ( serie, serie_season, serie_episode, serie['imdb_id'] )
+
 			# Create a torrent object.
 			torrent = torrent_structure ( )
 			
@@ -76,8 +90,9 @@ while True:
 			# Create torrent and add it to queue.
 			serie_info = {	'header' 		: 'n',
 							'serie_name' 	: serie['title'],
+							'year' 			: serie['year'],
 							'serie_season' 	: serie_season,
-							'serie_episode' 	: serie_episode,
+							'serie_episode' : serie_episode,
 							'serie_id' 		: serie['imdb_id'] }
 
 			torrent.set_serie_info ( serie_info )

@@ -72,4 +72,14 @@ class IMDbManager:
 			if episode.season == curr_season and episode.episode == curr_episode:
 				next_episode = True
 
+	def find_current_episode ( self, serie, curr_season, curr_episode, serie_id ):
+		'''
+			Description:	Find and return the next episode of specific serie.
+		'''
+
+		# Search all episodes of the serie and return the current episode.
+		for episode in self.imdb.get_episodes ( serie_id ):
+			if episode.season == curr_season and episode.episode == curr_episode:
+				return episode
+
 

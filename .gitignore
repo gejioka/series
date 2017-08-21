@@ -1,3 +1,2 @@
 .series_info
-src/*.pyc
-src/*.log
+code/*.pyc

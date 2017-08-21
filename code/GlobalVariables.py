@@ -7,6 +7,7 @@ class GlobalVariables:
 			Description:	Initialize a GlobalVariables object.
 		'''
 		self.transmission_client = transmission_client
+		self.con=None
 		self.list_of_torrents=[]
 		self.status_list=[]
 		self.exit_event=threading.Event ( )
@@ -75,3 +76,15 @@ class GlobalVariables:
 			Description:	Return the exit event.
 		'''
 		return self.exit_event
+
+	def set_db_connection ( self, con ):
+		'''
+			Description:	Set the seriesdb connection.
+		'''
+		self.con = con
+
+	def get_db_connection ( self ):
+		'''
+			Description:	Return seriesdb connection.
+		'''
+		return self.con

@@ -138,12 +138,15 @@ class FileManagement:
 		'''
 		with self.global_variables.get_lock ( ):
 			# Open file with series info for reading.
+			target=None
 			try:
 				target = open ( self.series_info_path, 'r' )
 			except Exception as err:
 				write_error_message ( '[!] ' + str ( err ) )
+
 			# Read all file.
 			data = [x.strip('\n') for x in target.readlines ( )]
+			
 			# Close file.
 			try:
 				target.close ( )
@@ -152,6 +155,7 @@ class FileManagement:
 
 			# Try to find serie with same id and update it.
 			count=0
+			serie_dict={}
 			for serie in data:
 				try:
 					serie_dict = ast.literal_eval ( serie )
@@ -208,6 +212,7 @@ class FileManagement:
 		'''
 			Description:	Find how similar are two different files.
 		'''
+
 		return SequenceMatcher ( None, first_file, second_file ).ratio ( )
 
 	def find_similar_file ( self ):
@@ -217,7 +222,7 @@ class FileManagement:
 		similar_w = 0
 		filename = ''
 		for file in os.listdir ( self.download_path_of_series ):
-			if self.similar ( file, self.filename ) > similar_w:
+			if self.similar ( file, str ( self.filename ) ) > similar_w:
 				similar_w = self.similar ( file, self.filename )
 				filename = file
 
@@ -240,7 +245,7 @@ class FileManagement:
 				# Write info message to series log file.
 				write_info_message ( '[-] Remove folder for download path.' )
 				# Remove folder.
-				os.rmdir ( correct_file )
+				os.rmdir ( self.download_path_of_series + correct_file )
 			else:
 				os.rename ( os.path.realpath ( self.download_path_of_series + correct_file ), self.path_for_episode + correct_file )
 				# Write info message to series log file.

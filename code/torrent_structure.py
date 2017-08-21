@@ -4,6 +4,7 @@ class torrent_structure:
 		self.serie_name=None
 		self.serie_season=None
 		self.serie_episode=None
+		self.episode_name=None
 		self.serie_id=None
 		self.serie_info=None
 
@@ -64,7 +65,7 @@ class torrent_structure:
 		self.serie_info = {	'header' 		: 'e',
 							'serie_name' 	: self.serie_name,
 							'serie_season' 	: self.serie_season,
-							'serie_episode' 	: self.serie_episode,
+							'serie_episode' : self.serie_episode,
 							'serie_id' 		: self.serie_id }
 
 	def set_serie_info ( self, serie_info ):
